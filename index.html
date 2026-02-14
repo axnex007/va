@@ -142,11 +142,12 @@ const lock=document.getElementById("lock");
 
 let i=-1;
 
-/* lock typing */
+/* LOCK TEXT */
 const msg="Only my Valentine knows this…";
-let t=0;(function(){if(t<msg.length){typed.innerHTML+=msg[t++];setTimeout(arguments.callee,45)}})();
+let t=0;
+(function(){if(t<msg.length){typed.innerHTML+=msg[t++];setTimeout(arguments.callee,45)}})();
 
-/* pin */
+/* PIN */
 let pin="";
 function press(n){if(pin.length>=4)return;pin+=n;upd();if(pin.length===4)checkPin();}
 function clearPin(){pin="";upd();}
@@ -171,36 +172,63 @@ else if(done)done();
 })();
 }
 
+/* LETTER (UNCHANGED TEXT) */
 const LETTER=`its been a long jouney since the day we met while dancing on December 1,i never imagined that we would be sharing such a close bond,what started as friends has turned into one of the best friendship i could ever ask for ,even when i proposed you earlier ,i thought it was over but somethings happen just to test your bond and whether how well you survive through tough time and if things are meant to happen ,destiny always serves you the justice and am truly thankful and grateful that i couldnt ask for anything more ,you are the best gift i have ever got and i am looking forward to spend my rest of the life with you
 
 -written with love from your beloved Ney`;
 
+/* SHOW PAGE */
 function show(n){
 
 pages.forEach(p=>p.classList.remove("active"));
 pages[n].classList.add("active");
 
+/* heartbeat grows */
 beat.volume=Math.min(.05+(n/pages.length)*.7,.85);
 
+/* vibrate proposal */
 if(pages[n].id==="proposal" && navigator.vibrate){
 navigator.vibrate([200,120,200,120,400]);
 }
 
 let txt=pages[n].querySelector(".text");
 
+/* LETTER PAGE — TYPE BUT DO NOT AUTO MOVE */
 if(pages[n].id==="letter"){
-typeText(letterText,LETTER,18,()=>{setTimeout(()=>go(n+1),1500);});
-}
-else if(txt){
-typeText(txt,txt.textContent);
-}
+typeText(letterText,LETTER,18);
+return;   // ⭐ IMPORTANT: stop auto navigation
 }
 
-document.addEventListener("click",e=>{if(i<0)return;(e.clientX>innerWidth*.4)?go(i+1):go(i-1)});
+/* NORMAL TEXT */
+if(txt) typeText(txt,txt.textContent);
+}
+
+/* NAVIGATION */
+
+document.addEventListener("click",e=>{
+if(i<0) return;
+
+/* ⭐ If currently on letter → next tap goes to proposal */
+if(pages[i].id==="letter"){
+go(i+1);
+return;
+}
+
+(e.clientX>innerWidth*.4)?go(i+1):go(i-1);
+});
+
 let sx=0;
 addEventListener("touchstart",e=>sx=e.touches[0].clientX);
+
 addEventListener("touchend",e=>{
 if(i<0)return;
+
+/* ⭐ same logic for swipe on letter */
+if(pages[i].id==="letter"){
+go(i+1);
+return;
+}
+
 let dx=e.changedTouches[0].clientX-sx;
 if(Math.abs(dx)<40)return;
 (dx<0)?go(i+1):go(i-1);
@@ -209,6 +237,7 @@ if(Math.abs(dx)<40)return;
 function go(n){
 if(n<0||n>=pages.length)return;
 i=n;show(i);
+
 let v=pages[i].querySelector("video");
 if(v){v.currentTime=0;v.play().catch(()=>{});}
 }
@@ -221,5 +250,7 @@ document.body.innerHTML=`<div style="position:fixed;inset:0;background:black;dis
 }
 
 </script>
+
 </body>
 </html>
+
