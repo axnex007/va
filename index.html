@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sea ❤️ Ney</title>
+
+<style>
+body{margin:0;background:black;color:white;font-family:system-ui;overflow:hidden}
+
+/* PAGES */
+
+.page{
+position:fixed;
+inset:0;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+padding:25px;
+opacity:0;
+pointer-events:none;
+transition:opacity .8s;
+}
+
+.active{opacity:1;pointer-events:auto;}
+
+.page img,.page video{
+max-width:92%;
+border-radius:22px;
+box-shadow:0 0 40px rgba(255,90,130,.5);
+margin-top:18px;
+}
+
+.text{font-size:26px;max-width:420px}
+
+/* TAP HINT */
+
+#hint{
+position:fixed;
+bottom:20px;
+width:100%;
+text-align:center;
+opacity:.8;
+animation:pulse 1.6s infinite;
+}
+@keyframes pulse{
+0%{opacity:.3}
+50%{opacity:1}
+100%{opacity:.3}
+}
+
+/* CINEMATIC FADE */
+
+#fade{
+position:fixed;
+inset:0;
+background:black;
+opacity:0;
+pointer-events:none;
+transition:opacity .6s;
+z-index:20;
+}
+
+/* BUTTON */
+
+button{
+padding:16px 32px;
+border:none;
+border-radius:40px;
+background:#ff3b6b;
+color:white;
+font-size:18px;
+margin-top:30px;
+}
+
+/* PETALS */
+
+.petal{
+position:fixed;top:-20px;
+animation:fall linear forwards;
+}
+@keyframes fall{to{transform:translateY(110vh);}}
+
+</style>
+</head>
+
+<body>
+
+<audio id="music" loop>
+<source src="music.mp3">
+</audio>
+
+<div id="fade"></div>
+
+<!-- PAGES -->
+
+<div class="page active">
+<div class="text">
+Before everything…<br>
+📚 Feb 14 — the library where it all started
+</div>
+<img src="library.jpeg">
+</div>
+
+<div class="page"><div class="text">Somewhere between laughs ❤️</div><img src="img1.jpeg"></div>
+<div class="page"><div class="text">More smiles, more memories</div><img src="img2.jpeg"></div>
+<div class="page"><div class="text">Every photo felt more special</div><img src="img3.jpeg"></div>
+<div class="page"><div class="text">Every moment easier ✨</div><img src="img4.jpeg"></div>
+<div class="page"><div class="text">My favorite person ❤️</div><img src="img5.jpeg"></div>
+
+<div class="page">
+<div class="text">Our first real meeting ☕</div>
+<video muted playsinline>
+<source src="vid1.mp4">
+</video>
+</div>
+
+<div class="page">
+<div class="text">The day I surprised you ✨</div>
+<video muted playsinline>
+<source src="vid2.mp4">
+</video>
+</div>
+
+<div class="page">
+<div class="text" style="font-size:34px">
+Sea… will you be my Valentine? 💍
+</div>
+<button onclick="yes()">YES ❤️</button>
+</div>
+
+<div id="hint">tap right →</div>
+
+<script>
+
+const pages=[...document.querySelectorAll(".page")];
+const fade=document.getElementById("fade");
+const music=document.getElementById("music");
+let i=0;
+
+/* START MUSIC SOFT */
+
+music.volume=.15;
+document.body.onclick=()=>music.play();
+
+/* PAGE SWITCH */
+
+function go(n){
+
+if(n<0||n>=pages.length) return;
+
+fade.style.opacity=1;
+
+setTimeout(()=>{
+
+pages[i].classList.remove("active");
+
+/* pause old video */
+let oldv=pages[i].querySelector("video");
+if(oldv) oldv.pause();
+
+i=n;
+pages[i].classList.add("active");
+
+/* autoplay new video */
+let newv=pages[i].querySelector("video");
+if(newv){ newv.currentTime=0; newv.play().catch(()=>{}); }
+
+/* MUSIC GETS LOUDER AS STORY GOES */
+music.volume=Math.min(.15 + (i/pages.length)*.75,1);
+
+fade.style.opacity=0;
+
+},450);
+}
+
+/* TAP RIGHT / LEFT LIKE INSTAGRAM */
+
+document.addEventListener("click",e=>{
+if(e.clientX > innerWidth*0.4) go(i+1);
+else go(i-1);
+});
+
+/* YES FIREWORK */
+
+function yes(){
+
+for(let k=0;k<100;k++){
+let h=document.createElement("div");
+h.innerHTML="❤️";
+h.style.position="fixed";
+h.style.left=innerWidth/2+"px";
+h.style.top=innerHeight/2+"px";
+h.style.fontSize="28px";
+h.style.transition="1.4s";
+document.body.appendChild(h);
+
+setTimeout(()=>{
+h.style.transform=
+`translate(${Math.random()*800-400}px,${Math.random()*800-400}px)`;
+h.style.opacity=0;
+},20);
+
+setTimeout(()=>h.remove(),1500);
+}
+
+setTimeout(()=>{
+document.body.innerHTML+=`
+<div style="position:fixed;inset:0;background:black;
+display:flex;justify-content:center;align-items:center;
+font-size:34px;text-align:center;">
+❤️ Sea said YES ❤️<br><br>
+Screenshot this moment<br>and send to Ney 📸
+</div>`;
+},900);
+
+}
+
+/* PETALS */
+
+setInterval(()=>{
+let p=document.createElement("div");
+p.className="petal";
+p.innerHTML="🌹";
+p.style.left=Math.random()*100+"vw";
+p.style.animationDuration=(5+Math.random()*5)+"s";
+document.body.appendChild(p);
+setTimeout(()=>p.remove(),10000);
+},450);
+
+</script>
+</body>
+</html>
