@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sea ❤️ Ney</title>
+
+<style>
+body{margin:0;background:black;color:white;font-family:system-ui;overflow:hidden}
+#stars{position:fixed;inset:0;z-index:-1}
+
+.page{
+position:fixed; inset:0;
+display:flex; flex-direction:column;
+justify-content:center; align-items:center;
+text-align:center; padding:25px;
+opacity:0; pointer-events:none;
+transition:opacity .9s;
+overflow:auto;
+}
+.active{opacity:1;pointer-events:auto;}
+
+.page img,.page video{
+max-width:92%;
+border-radius:22px;
+box-shadow:0 0 40px rgba(255,90,130,.5);
+margin-top:18px;
+}
+
+.text{font-size:26px;max-width:700px;line-height:1.6}
+
+/* ⭐ LETTER MOBILE FIX (PROPER LOCATION) */
+
+#letter .text{
+font-size:22px;
+max-width:90vw;
+overflow-y:auto;
+padding:10px;
+}
+
+@media(max-width:600px){
+#letter .text{
+font-size:17px;
+line-height:1.7;
+max-height:75vh;
+}
+}
+
+button{
+padding:16px 32px;border:none;border-radius:40px;
+background:#ff3b6b;color:white;font-size:18px;margin-top:30px;
+}
+
+.pinDots{display:flex;gap:18px;margin-top:25px;}
+.dot{width:18px;height:18px;border-radius:50%;border:2px solid #ff6b9a}
+.dot.fill{background:#ff3b6b;box-shadow:0 0 12px #ff3b6b}
+
+.keypad{display:grid;grid-template-columns:repeat(3,80px);gap:14px;margin-top:35px}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="stars"></canvas>
+
+<audio id="music" loop><source src="music.mp3"></audio>
+<audio id="beat" loop><source src="heartbeat.mp3"></audio>
+
+<!-- LOCK -->
+<div class="page active" id="lock">
+<div style="font-size:38px">❤️</div>
+<div id="typed"></div>
+
+<div class="pinDots">
+<div class="dot"></div><div class="dot"></div>
+<div class="dot"></div><div class="dot"></div>
+</div>
+
+<div class="keypad">
+<button onclick="press(1)">1</button><button onclick="press(2)">2</button><button onclick="press(3)">3</button>
+<button onclick="press(4)">4</button><button onclick="press(5)">5</button><button onclick="press(6)">6</button>
+<button onclick="press(7)">7</button><button onclick="press(8)">8</button><button onclick="press(9)">9</button>
+<button onclick="clearPin()">⌫</button><button onclick="press(0)">0</button><button onclick="clearPin()">✕</button>
+</div>
+
+<div id="wrong" style="margin-top:18px;color:#ff7b90;height:20px"></div>
+</div>
+
+<!-- STORY -->
+<div class="page"><div class="text">📚 Feb 14 — the library where it all started</div><img src="library.jpg"></div>
+<div class="page"><div class="text">Somewhere between laughs ❤️</div><img src="img1.jpeg"></div>
+<div class="page"><div class="text">More smiles, more memories</div><img src="img2.jpeg"></div>
+<div class="page"><div class="text">Every photo felt more special</div><img src="img3.jpeg"></div>
+<div class="page"><div class="text">Every moment easier ✨</div><img src="img4.jpeg"></div>
+<div class="page"><div class="text">My favorite person ❤️</div><img src="img5.jpeg"></div>
+
+<div class="page"><div class="text">Our first real meeting ☕</div><video muted playsinline><source src="vid1.mp4"></video></div>
+<div class="page"><div class="text">The day I surprised you ✨</div><video muted playsinline><source src="vid2.mp4"></video></div>
+
+<!-- LETTER -->
+<div class="page" id="letter">
+<div class="text" id="letterText"></div>
+</div>
+
+<!-- PROPOSAL -->
+<div class="page" id="proposal">
+<div class="text" style="font-size:34px">Sea… will you be my Valentine? 💍</div>
+<button onclick="yes()">YES ❤️</button>
+</div>
+
+<script>
+
+/* STAR SKY */
+const canvas=document.getElementById("stars");
+const ctx=canvas.getContext("2d");
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+resize();addEventListener("resize",resize);
+
+let stars=[...Array(120)].map(()=>({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*1.4+.3,
+d:Math.random()*.4+.05
+}));
+
+(function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+for(let s of stars){
+ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.28);
+ctx.fillStyle="white";ctx.fill();
+s.y+=s.d;
+if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width;}
+}
+requestAnimationFrame(draw);
+})();
+
+const pages=[...document.querySelectorAll(".page:not(#lock)")];
+const music=document.getElementById("music");
+const beat=document.getElementById("beat");
+const lock=document.getElementById("lock");
+
+let i=-1;
+
+/* lock typing */
+const msg="Only my Valentine knows this…";
+let t=0;(function(){if(t<msg.length){typed.innerHTML+=msg[t++];setTimeout(arguments.callee,45)}})();
+
+/* pin */
+let pin="";
+function press(n){if(pin.length>=4)return;pin+=n;upd();if(pin.length===4)checkPin();}
+function clearPin(){pin="";upd();}
+function upd(){document.querySelectorAll(".dot").forEach((d,i)=>d.classList.toggle("fill",i<pin.length));}
+
+function checkPin(){
+if(pin==="1704"){
+lock.style.display="none";
+music.play().catch(()=>{});
+beat.volume=.05;beat.play().catch(()=>{});
+setTimeout(()=>{i=0;show(i)},500);
+}else{wrong.innerText="Wrong birthday ❤️";pin="";upd();}
+}
+
+/* TYPE */
+function typeText(el,text,speed=28,done){
+el.innerHTML="";
+let k=0;
+(function(){
+if(k<text.length){el.innerHTML+=text[k++];setTimeout(arguments.callee,speed);}
+else if(done)done();
+})();
+}
+
+const LETTER=`its been a long jouney since the day we met while dancing on December 1,i never imagined that we would be sharing such a close bond,what started as friends has turned into one of the best friendship i could ever ask for ,even when i proposed you earlier ,i thought it was over but somethings happen just to test your bond and whether how well you survive through tough time and if things are meant to happen ,destiny always serves you the justice and am truly thankful and grateful that i couldnt ask for anything more ,you are the best gift i have ever got and i am looking forward to spend my rest of the life with you
+
+-written with love from your beloved Ney`;
+
+function show(n){
+
+pages.forEach(p=>p.classList.remove("active"));
+pages[n].classList.add("active");
+
+beat.volume=Math.min(.05+(n/pages.length)*.7,.85);
+
+if(pages[n].id==="proposal" && navigator.vibrate){
+navigator.vibrate([200,120,200,120,400]);
+}
+
+let txt=pages[n].querySelector(".text");
+
+if(pages[n].id==="letter"){
+typeText(letterText,LETTER,18,()=>{setTimeout(()=>go(n+1),1500);});
+}
+else if(txt){
+typeText(txt,txt.textContent);
+}
+}
+
+document.addEventListener("click",e=>{if(i<0)return;(e.clientX>innerWidth*.4)?go(i+1):go(i-1)});
+let sx=0;
+addEventListener("touchstart",e=>sx=e.touches[0].clientX);
+addEventListener("touchend",e=>{
+if(i<0)return;
+let dx=e.changedTouches[0].clientX-sx;
+if(Math.abs(dx)<40)return;
+(dx<0)?go(i+1):go(i-1);
+});
+
+function go(n){
+if(n<0||n>=pages.length)return;
+i=n;show(i);
+let v=pages[i].querySelector("video");
+if(v){v.currentTime=0;v.play().catch(()=>{});}
+}
+
+function yes(){
+beat.pause();
+document.body.innerHTML=`<div style="position:fixed;inset:0;background:black;display:flex;justify-content:center;align-items:center;font-size:34px;text-align:center;">
+❤️ Sea said YES ❤️<br><br>Forever begins now
+</div>`;
+}
+
+</script>
+</body>
+</html>
